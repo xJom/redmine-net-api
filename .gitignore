@@ -6,3 +6,5 @@ Test/UnitTestRedmine.cs
 Test/Properties/AssemblyInfo.cs
 
 UnitTestRedmineNetApi/App.config 
+redmine-net-api.v12.suo
+UnitTest-redmine-net40-api/App.config

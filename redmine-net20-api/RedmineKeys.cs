@@ -213,5 +213,11 @@ namespace Redmine.Net.Api
 		public const string TOTAL_COUNT = "total_count";
 
         public const string SUBPROJECT_ID = "subproject_id";
+
+        #region RedmineBacklogs
+        public const string STORY_POINTS = "story_points";
+        public const string RELEASE = "release";
+        public const string RELEASE_ID = "release_id";
+        #endregion RedmineBacklogs
     }
 }

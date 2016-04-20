@@ -263,6 +263,22 @@ namespace Redmine.Net.Api.Types
         [XmlArrayItem(RedmineKeys.WATCHER)]
         public IList<Watcher> Watchers { get; set; }
 
+        /// <summary>
+        /// Gets or sets the release where the issue is included.
+        /// </summary>
+        /// <value>
+        /// The release.
+        /// </value>
+        [XmlElement(RedmineKeys.RELEASE)]
+        public IdentifiableName Release { get; set; }
+
+        /// <summary>
+        /// Gets or sets the story points.
+        /// </summary>
+        /// <value>The story points.</value>
+        [XmlElement(RedmineKeys.STORY_POINTS, IsNullable = true)]
+        public float? StoryPoints { get; set; }
+
         public XmlSchema GetSchema()
         {
             return null;
@@ -402,6 +418,14 @@ namespace Redmine.Net.Api.Types
                         Watchers = reader.ReadElementContentAsCollection<Watcher>();
                         break;
 
+                    case RedmineKeys.RELEASE:
+                        Release = new IdentifiableName(reader);
+                        break;
+
+                    case RedmineKeys.STORY_POINTS:
+                        EstimatedHours = reader.ReadElementContentAsNullableFloat();
+                        break;
+
                     default:
                         reader.Read();
                         break;
@@ -443,6 +467,10 @@ namespace Redmine.Net.Api.Types
             writer.WriteArray(CustomFields, RedmineKeys.CUSTOM_FIELDS);
 
             writer.WriteListElements(Watchers as IList<IValue>, RedmineKeys.WATCHER_USER_IDS);
+
+            writer.WriteIdIfNotNull(Release, RedmineKeys.RELEASE_ID);
+            writer.WriteValueOrEmpty(StoryPoints, RedmineKeys.STORY_POINTS);
+
         }
 
         public object Clone()
@@ -466,7 +494,9 @@ namespace Redmine.Net.Api.Types
                 Project = Project,
                 FixedVersion = FixedVersion,
                 Notes = Notes,
-                Watchers = Watchers.Clone()
+                Watchers = Watchers.Clone(),
+                Release = Release,
+                StoryPoints = StoryPoints
             };
             return issue;
         }
@@ -504,15 +534,17 @@ namespace Redmine.Net.Api.Types
             && (Children != null ?  Children.Equals<IssueChild>(other.Children) : other.Children == null)
             && (Journals != null ? Journals.Equals<Journal>(other.Journals) : other.Journals == null)
             && (Relations != null ? Relations.Equals<IssueRelation>(other.Relations) : other.Relations == null)
+            && Release == other.Release
+            && StoryPoints == other.StoryPoints
             );
         }
 
         public override string ToString()
         {
-            return string.Format("[Issue: {30}, Project={0}, Tracker={1}, Status={2}, Priority={3}, Author={4}, Category={5}, Subject={6}, Description={7}, StartDate={8}, DueDate={9}, DoneRatio={10}, PrivateNotes={11}, EstimatedHours={12}, SpentHours={13}, CustomFields={14}, CreatedOn={15}, UpdatedOn={16}, ClosedOn={17}, Notes={18}, AssignedTo={19}, ParentIssue={20}, FixedVersion={21}, IsPrivate={22}, Journals={23}, Changesets={24}, Attachments={25}, Relations={26}, Children={27}, Uploads={28}, Watchers={29}]",
+            return string.Format("[Issue: {30}, Project={0}, Tracker={1}, Status={2}, Priority={3}, Author={4}, Category={5}, Subject={6}, Description={7}, StartDate={8}, DueDate={9}, DoneRatio={10}, PrivateNotes={11}, EstimatedHours={12}, SpentHours={13}, CustomFields={14}, CreatedOn={15}, UpdatedOn={16}, ClosedOn={17}, Notes={18}, AssignedTo={19}, ParentIssue={20}, FixedVersion={21}, IsPrivate={22}, Journals={23}, Changesets={24}, Attachments={25}, Relations={26}, Children={27}, Uploads={28}, Watchers={29}, Release={30}, StoryPoints={31}]",
                 Project, Tracker, Status, Priority, Author, Category, Subject, Description, StartDate, DueDate, DoneRatio, PrivateNotes,
                 EstimatedHours, SpentHours, CustomFields, CreatedOn, UpdatedOn, ClosedOn, Notes, AssignedTo, ParentIssue, FixedVersion,
-                IsPrivate, Journals, Changesets, Attachments, Relations, Children, Uploads, Watchers, base.ToString());
+                IsPrivate, Journals, Changesets, Attachments, Relations, Children, Uploads, Watchers, Release, StoryPoints, base.ToString());
         }
 
         public override int GetHashCode()
@@ -553,6 +585,9 @@ namespace Redmine.Net.Api.Types
             hashCode = Utils.GetHashCode(Children, hashCode);
             hashCode = Utils.GetHashCode(Uploads, hashCode);
             hashCode = Utils.GetHashCode(Watchers, hashCode);
+
+            hashCode = Utils.GetHashCode(Release, hashCode);
+            hashCode = Utils.GetHashCode(StoryPoints, hashCode);
 
             return hashCode;
         }
